@@ -51,6 +51,12 @@ only the roles your `auth.method` needs:
 Releases separately need `GPG_PRIVATE_KEY` and — when the key has one —
 `GPG_PRIVATE_KEY_PASSPHRASE`; the registry requires signed checksums.
 
+Two further optional secrets, `TFPFGEN_APP_ID` and `TFPFGEN_APP_PRIVATE_KEY`,
+belong to the pipeline's own GitHub App rather than to any `auth.method`. They
+are what lets generation resume by itself after the last correction is
+decided — see
+[The GitHub App the auto-continuation needs](#the-github-app-the-auto-continuation-needs).
+
 Validation checks presence without reading values; only the audit job ever
 receives them. Acceptance tests use a different namespace entirely — the
 `TF_<PROVIDER>_*` variables the generated provider itself reads, held in a
@@ -119,27 +125,217 @@ forms are understood:
 
 Its absence degrades gracefully — the audit covers what it can.
 
-## Corrections
+## The corrections decision flow
 
-When observations show the published document is wrong about the live API,
-`tfpfgen spec revise` **proposes** corrections under
-`spec/corrections/proposed/` — each one RFC 6902 operations plus a
-justification and an evidence pointer to an observation. The verb
-**hard-fails while any proposal is pending**, naming each file; no ignore
-flag exists. Resolve every proposal in one of two ways:
+This is the one part of the pipeline that waits for you.
 
-- **Accept** — move the file into `spec/corrections/`. Revision applies it
-  to produce `spec/revised.yaml`, the single source of truth for all
-  generation.
-- **Reject** — leave a marker in `spec/corrections/rejected/`: one JSON file
-  naming the observation id and the reason, shaped
-  `{"observationID": "…", "reason": "…", "rejectedAt": "…"}`. The proposal is
-  never re-raised while the marker stands; deleting the marker is the only way
-  back.
+**Where corrections come from.** After the audit, `tfpfgen spec revise`
+compiles the confirmed observations into proposed corrections under
+`spec/corrections/proposed/` — each one a set of RFC 6902 operations against
+the imported document, a required justification, and an evidence pointer to
+the observation that proves it. A correction is only ever compiled from what
+the live API actually did.
 
-Correction categories listed in `tfpfgen.yaml`'s `audit.auto_accept` skip
-`proposed/` and land accepted directly (named with an `auto-NNN-` prefix);
-everything else waits for a human.
+**What is decided for you.** Observation kinds listed in `audit.auto_accept`
+in `tfpfgen.yaml` skip proposal: their corrections land accepted directly,
+named with an `auto-NNN-` prefix, and you never see a pull request for them.
+Nothing is on that list until you put it there.
+
+**What is asked of you.** Every other proposal becomes **its own pull
+request**, labelled `tfpfgen-correction`, on a branch
+`tfpfgen/correction-<observationID>`. One PR carries exactly one correction
+file, so each decision is separable. The PR body carries the justification,
+the RFC 6902 operations, the pointer to the audit evidence behind it, and a
+`tfpfgen-run-id:` line naming the run that proposed it.
+
+**How to decide.** There are two answers and no third:
+
+- **Accept — merge the pull request.** The merge moves the correction file
+  into `spec/corrections/`, where revision applies it to produce
+  `spec/revised.yaml`, the single source of truth for all generation.
+- **Reject — close the pull request without merging.** A rejection marker is
+  committed to `spec/corrections/rejected/<observationID>.json`, shaped
+  `{"observationID": "…", "reason": "…", "rejectedAt": "…"}`, and that
+  observation is never proposed again while the marker stands. **The last
+  comment on the PR becomes the recorded reason**, so leave one before you
+  close. Deleting the marker is the only way back.
+
+`tfpfgen spec revise` hard-fails while any proposal is still pending, naming
+each file. There is no ignore flag, and a correction cannot be left undecided
+and forgotten.
+
+**What happens next.** Closing the last open correction PR is the trigger: the
+corrections workflow sees that none remain and resumes generation, reusing the
+observations the audit already recorded. No new API calls are made — your
+decisions are replayed against evidence already on disk — and the run
+continues through SDK generation, provider generation and verification to open
+the generated-provider PR on `tfpfgen/run-<id>`.
+
+That auto-continuation is the only part of the flow that depends on more than
+the stock `GITHUB_TOKEN`; see below. Without it, nothing is lost and nothing
+is stuck — the run's log names the run id, and you dispatch **Actions →
+generate → Run workflow** yourself with `reuse_audit_run_id` set to the number
+on the `tfpfgen-run-id:` line at the foot of any correction PR body. The run
+continues from the same observations.
+
+### The GitHub App the auto-continuation needs
+
+**Why an App is needed at all.** GitHub deliberately refuses to let a workflow
+start another workflow using the stock `GITHUB_TOKEN`: a `workflow_dispatch`
+made with it is accepted and silently starts no run, and a commit it authors
+raises no event. The rule exists to stop a workflow looping forever on its own
+output, and the corrections flow runs straight into it, because that flow's
+last act is exactly such a dispatch — the corrections workflow ends by running
+`gh workflow run 10-generate.yml -f reuse_audit_run_id=<id>`. With
+`GITHUB_TOKEN` that call does nothing at all. So closing the decision loop
+needs an identity of its own, one whose actions GitHub does treat as triggers.
+A **GitHub App installed on this repository** is that identity, and the only
+reason it exists here.
+
+**Why an App rather than a personal access token.** A PAT would satisfy the
+same rule, and that is the whole of its case. An App is owned by the
+organisation rather than by a person, so it does not leave when they do; it is
+installed on named repositories with named permissions, instead of carrying
+one account's whole reach; and what sits in the secret is a private key, from
+which `actions/create-github-app-token` mints an installation token afresh on
+each run — valid for an hour, then worthless — rather than a long-lived
+credential waiting in a secret store for somebody to remember to rotate it.
+The correction PRs are then attributed to the App, so the history reads as the
+pipeline acting rather than as a maintainer who did not.
+
+**The two secrets.** The App's credentials are set as repository secrets:
+
+| Secret | What it is |
+|---|---|
+| `TFPFGEN_APP_ID` | App ID of the pipeline's GitHub App. Not secret in itself — it is on the App's settings page — but the workflows read it as a secret so that its absence and the key's are one condition. |
+| `TFPFGEN_APP_PRIVATE_KEY` | The PEM private key of that same App, exactly as downloaded. |
+
+Both are optional, and both workflows test them together: the App path is
+taken only when `TFPFGEN_APP_ID` and `TFPFGEN_APP_PRIVATE_KEY` are both
+non-empty. Setting one alone changes nothing.
+
+**They are not the audit's credentials.** `TFPFGEN_APP_*` is the pipeline's
+own identity on GitHub. `TFPFGEN_AUTH_*` — including
+`TFPFGEN_AUTH_APP_ID` and `TFPFGEN_AUTH_APP_PRIVATE_KEY` in the secrets table
+above, and `TFPFGEN_AUTH_TOKEN`, which is what this repository's
+`bearer_token` method reads — are credentials for the API being audited, read
+only by the audit job. The two prefixes are one word apart in the middle and
+have nothing to do with each other; setting one pair does not set the other.
+
+**The permissions, and what exercises each.** Grant the App these four
+repository permissions and no others:
+
+| Permission | Exercised by |
+|---|---|
+| **contents: write** | Pushing each `tfpfgen/correction-<observationID>` branch in the generate workflow, and committing the rejection marker to the default branch in the corrections workflow. |
+| **pull requests: write** | Opening one correction PR per proposal, and listing the open ones to decide whether any decision is still outstanding. |
+| **issues: write** | Creating and applying the `tfpfgen-correction` label — labels are the issues API even on a pull request, so labelling fails without it. |
+| **actions: write** | Dispatching the continuation run — the `gh workflow run` above, the thing the App exists for. |
+
+A workflow job's own `permissions:` block bounds `GITHUB_TOKEN` only; it has
+no effect on the App's token, which carries whatever the installation was
+granted. These four therefore have to be granted on the App itself, not
+inferred from the workflows.
+
+**Registering and installing it.** Done once per organisation; the same App is
+then installed on each provider repository.
+
+1. Register the App on the organisation — **Settings → Developer settings →
+   GitHub Apps → New GitHub App**, following
+   [GitHub's instructions](https://docs.github.com/en/apps/creating-github-apps/registering-a-github-app/registering-a-github-app).
+2. **Untick Active under Webhook.** The pipeline never receives webhooks — it
+   only ever calls the REST API — so an active webhook would only ask GitHub
+   to post to a URL nothing reads.
+3. Set the four repository permissions in the table above.
+4. **Generate a private key** at the foot of the App's settings page. GitHub
+   hands you a `.pem` once and keeps no copy of it; a key can be revoked and
+   another generated at any time.
+5. **Install the App on the provider repository** — App settings → Install
+   App → the organisation → *Only select repositories*.
+6. Set the two repository secrets. The key is read from the file rather than
+   pasted, so it never reaches a shell history:
+
+   ```bash
+   gh secret set TFPFGEN_APP_ID --body <the App ID from its settings page>
+   gh secret set TFPFGEN_APP_PRIVATE_KEY < <the .pem you downloaded>
+   ```
+
+   Delete the local `.pem` afterwards; it has no further use, and generating a
+   replacement is a two-click job if it is ever needed again.
+
+Setting the pair once at organisation level instead saves repeating step 6 for
+every provider repository:
+
+```bash
+gh secret set TFPFGEN_APP_ID --org deploymenttheory --visibility selected \
+  --repos terraform-provider-thousandeyes-1
+```
+
+That needs `admin:org` on whatever token `gh` is authenticated with, which a
+repository-scoped token does not carry. Repository secrets are the fallback
+and behave identically — the workflows cannot tell which they were handed.
+
+**What happens without the App.** The pipeline is not blocked by its absence,
+and nothing is lost. Both workflows fall back to `github.token`: correction
+PRs are still opened, still labelled, still carry their justification and
+evidence; merging still accepts; closing still writes the rejection marker to
+`spec/corrections/rejected/`. The single missing step is the automatic resume,
+and the workflow says so rather than failing. The generate workflow warns at
+the point it opens the PRs:
+
+> `TFPFGEN_APP_ID/TFPFGEN_APP_PRIVATE_KEY` are unset; correction PRs are
+> opened with `github.token`. They open and merge normally, but a merge
+> authored by `GITHUB_TOKEN` raises no event, so the continuation run must be
+> dispatched by hand.
+
+and when the last correction is decided, the corrections workflow prints the
+run id to dispatch with:
+
+> every correction is decided. Dispatch `10-generate.yml` with
+> `reuse_audit_run_id=<id>` to continue — a `GITHUB_TOKEN` dispatch starts no
+> run, so install the tfpfgen App to have this happen by itself.
+
+That is the manual dispatch described above, and it resumes from the same
+observations, so it costs no extra API calls. The App buys one thing: not
+having to read that notice.
+
+### Where this repository stands
+
+The general description above is what a provider repository can be. This is
+what this one currently is.
+
+**The App is registered and installed.** `tfpfgen-pipeline`, App ID
+**`4561840`**, owned by the `deploymenttheory` organisation, is installed on
+this repository. Its App ID is recorded here because it is not secret; the
+private key exists only as the `.pem` its holder downloaded and as the secret
+below.
+
+**Both secrets are set on this repository**, alongside the audit's own
+credential:
+
+| Secret | Role |
+|---|---|
+| `TFPFGEN_APP_ID` | The pipeline's identity — `4561840`. |
+| `TFPFGEN_APP_PRIVATE_KEY` | That App's PEM key. |
+| `TFPFGEN_AUTH_TOKEN` | The ThousandEyes API bearer token the audit uses. Unrelated to the two above. |
+
+They were set per repository rather than at organisation level, which needs
+`admin:org`. Setting them for the organisation later would be equivalent and
+would save doing this again for the next provider repository.
+
+**So the generate workflow opens its correction PRs as the App**, not as
+`github-actions[bot]`, and the warning quoted above does not appear here.
+
+**One step is still outstanding.** This repository's callers were stamped
+before the corrections workflow existed: `.github/workflows/` holds
+`10-generate`, `20-ci`, `30-acceptance`, `40-docs` and `50-release`, and no
+caller for `20-corrections`. Nothing therefore runs when a correction PR
+closes — the rejection marker is not written, and the continuation is not
+dispatched — however well the App is installed. The App is in place; the
+workflow that would use it is not yet. Adding that caller, as the template now
+carries it, is what turns auto-continuation on here.
+
+## What a correction can carry
 
 Some corrections do more than fix a field. From what it learns about the API's
 conditional behaviour, the audit can add `x-tfpfgen-*` extensions to the
