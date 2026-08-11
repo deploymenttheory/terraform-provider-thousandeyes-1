@@ -1,0 +1,11 @@
+{
+  "justification": "the audit confirmed an updateStyle observation on endpoint_tests_dynamic_tests_agent_to_server: the update operation treats omitted fields as put-full (x-tfpfgen-update-style)",
+  "evidence": "audit/observations/endpoint_tests_dynamic_tests_agent_to_server.observations.json#4d4c1f00ef5fd206",
+  "operations": [
+    {
+      "op": "add",
+      "path": "/paths/~1endpoint~1tests~1dynamic-tests~1agent-to-server~1{testId}/patch/x-tfpfgen-update-style",
+      "value": "put-full"
+    }
+  ]
+}
