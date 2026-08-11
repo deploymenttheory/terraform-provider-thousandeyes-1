@@ -3,7 +3,7 @@ provider:
   name: thousandeyes
   registry_namespace: deploymenttheory
 generator:
-  version: v0.3.4
+  version: v0.4.0
 spec:
   document_url: https://pubhub.devnetcloud.com/media/000-v7-apis/docs/reference/unified-oas/api.yaml
 sdk:
@@ -18,3 +18,6 @@ audit:
   name_prefix: tfpfgen
   max_objects: 25
   rate_limit_rps: 6
+  # Applied without a pull request: the list envelope is a structural
+  # fact the generator needs, read straight off the live response.
+  auto_accept: [listResponseShape]
