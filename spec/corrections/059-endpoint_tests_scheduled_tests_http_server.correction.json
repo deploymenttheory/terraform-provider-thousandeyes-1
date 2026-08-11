@@ -1,0 +1,11 @@
+{
+  "justification": "the audit confirmed an ignoredOnUpdate observation on endpoint_tests_scheduled_tests_http_server.hasPing: updates accept a new value with a success status and do not apply it (x-tfpfgen-silently-ignored-on-update)",
+  "evidence": "audit/observations/endpoint_tests_scheduled_tests_http_server.observations.json#961722c88f88c0d8",
+  "operations": [
+    {
+      "op": "add",
+      "path": "/components/schemas/Endpoint_Tests_API_EndpointHttpServerInstantTest/allOf/2/properties/hasPing/x-tfpfgen-silently-ignored-on-update",
+      "value": true
+    }
+  ]
+}
