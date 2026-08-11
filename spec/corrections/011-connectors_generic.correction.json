@@ -1,0 +1,11 @@
+{
+  "justification": "the audit confirmed a deleteNotFoundOK observation on connectors_generic: deleting an already-deleted object answers 404, which delete logic should treat as success (x-tfpfgen-delete-not-found-ok)",
+  "evidence": "audit/observations/connectors_generic.observations.json#15101c43f415e96e",
+  "operations": [
+    {
+      "op": "add",
+      "path": "/paths/~1connectors~1generic~1{id}/delete/x-tfpfgen-delete-not-found-ok",
+      "value": true
+    }
+  ]
+}
