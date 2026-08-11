@@ -1,0 +1,11 @@
+{
+  "justification": "the audit confirmed a serverDefault observation on account_group.isDefaultAccountGroup: omitting the property stores the constant false",
+  "evidence": "audit/observations/account_group.observations.json#67dc2aa3f036e8db",
+  "operations": [
+    {
+      "op": "add",
+      "path": "/components/schemas/Administrative_API_AccountGroupInfo/allOf/1/properties/isDefaultAccountGroup/default",
+      "value": false
+    }
+  ]
+}
