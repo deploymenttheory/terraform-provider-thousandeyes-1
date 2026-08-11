@@ -1,0 +1,11 @@
+{
+  "justification": "the audit confirmed a serverDefault observation on connectors_generic.lastModifiedDate: omitting the property stores the constant 1786466338768",
+  "evidence": "audit/observations/connectors_generic.observations.json#c67aa8a60e3ac2ed",
+  "operations": [
+    {
+      "op": "add",
+      "path": "/components/schemas/Integrations_API_GenericConnector/properties/lastModifiedDate/default",
+      "value": 1786466338768
+    }
+  ]
+}
