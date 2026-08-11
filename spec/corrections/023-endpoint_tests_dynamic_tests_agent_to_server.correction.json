@@ -1,0 +1,11 @@
+{
+  "justification": "the audit confirmed a readAfterWrite observation on endpoint_tests_dynamic_tests_agent_to_server: a read may lag a write by up to 0s (x-tfpfgen-eventual-consistency)",
+  "evidence": "audit/observations/endpoint_tests_dynamic_tests_agent_to_server.observations.json#9b4c8bc29a45a7ed",
+  "operations": [
+    {
+      "op": "add",
+      "path": "/paths/~1endpoint~1tests~1dynamic-tests~1agent-to-server~1{testId}/get/x-tfpfgen-eventual-consistency",
+      "value": "0s"
+    }
+  ]
+}
