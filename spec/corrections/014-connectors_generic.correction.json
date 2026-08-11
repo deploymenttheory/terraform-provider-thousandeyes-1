@@ -1,0 +1,11 @@
+{
+  "justification": "the audit confirmed an updateStyle observation on connectors_generic: the update operation treats omitted fields as put-full (x-tfpfgen-update-style)",
+  "evidence": "audit/observations/connectors_generic.observations.json#2c0b82b769bcc040",
+  "operations": [
+    {
+      "op": "add",
+      "path": "/paths/~1connectors~1generic~1{id}/put/x-tfpfgen-update-style",
+      "value": "put-full"
+    }
+  ]
+}
