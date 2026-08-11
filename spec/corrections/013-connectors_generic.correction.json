@@ -1,0 +1,11 @@
+{
+  "justification": "the audit confirmed a readAfterWrite observation on connectors_generic: a read may lag a write by up to 0s (x-tfpfgen-eventual-consistency)",
+  "evidence": "audit/observations/connectors_generic.observations.json#e0362e74775fc1c9",
+  "operations": [
+    {
+      "op": "add",
+      "path": "/paths/~1connectors~1generic~1{id}/get/x-tfpfgen-eventual-consistency",
+      "value": "0s"
+    }
+  ]
+}
