@@ -1,0 +1,42 @@
+{
+  "justification": "the audit confirmed a values observation on endpoint_tests_dynamic_tests_agent_to_server.ipVersion: the live API rejects the documented value(s) OS_DEFAULT, V4_ONLY, V6_ONLY, V6_PREFER",
+  "evidence": "audit/observations/endpoint_tests_dynamic_tests_agent_to_server.observations.json#780b881ecb4ccaac",
+  "operations": [
+    {
+      "op": "test",
+      "path": "/components/schemas/Endpoint_Tests_API_EndpointIpVersionIn/enum/3",
+      "value": "OS_DEFAULT"
+    },
+    {
+      "op": "remove",
+      "path": "/components/schemas/Endpoint_Tests_API_EndpointIpVersionIn/enum/3"
+    },
+    {
+      "op": "test",
+      "path": "/components/schemas/Endpoint_Tests_API_EndpointIpVersionIn/enum/0",
+      "value": "V4_ONLY"
+    },
+    {
+      "op": "remove",
+      "path": "/components/schemas/Endpoint_Tests_API_EndpointIpVersionIn/enum/0"
+    },
+    {
+      "op": "test",
+      "path": "/components/schemas/Endpoint_Tests_API_EndpointIpVersionIn/enum/0",
+      "value": "V6_ONLY"
+    },
+    {
+      "op": "remove",
+      "path": "/components/schemas/Endpoint_Tests_API_EndpointIpVersionIn/enum/0"
+    },
+    {
+      "op": "test",
+      "path": "/components/schemas/Endpoint_Tests_API_EndpointIpVersionIn/enum/0",
+      "value": "V6_PREFER"
+    },
+    {
+      "op": "remove",
+      "path": "/components/schemas/Endpoint_Tests_API_EndpointIpVersionIn/enum/0"
+    }
+  ]
+}
