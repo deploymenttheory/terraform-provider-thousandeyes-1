@@ -1,0 +1,11 @@
+{
+  "justification": "the audit confirmed a volatile observation on account_group.accountToken: the value differs between two identical reads (x-tfpfgen-volatile)",
+  "evidence": "audit/observations/account_group.observations.json#a7e1ad1e3168d855",
+  "operations": [
+    {
+      "op": "add",
+      "path": "/components/schemas/Administrative_API_AccountGroupDetail/allOf/1/properties/accountToken/x-tfpfgen-volatile",
+      "value": true
+    }
+  ]
+}
