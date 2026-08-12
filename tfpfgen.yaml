@@ -3,7 +3,7 @@ provider:
   name: thousandeyes
   registry_namespace: deploymenttheory
 generator:
-  version: v0.4.2
+  version: v0.4.3
 spec:
   document_url: https://pubhub.devnetcloud.com/media/000-v7-apis/docs/reference/unified-oas/api.yaml
 sdk:
