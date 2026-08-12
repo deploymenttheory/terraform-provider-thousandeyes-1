@@ -1,0 +1,11 @@
+{
+  "justification": "the audit confirmed an updateStyle observation on account_group: the update operation treats omitted fields as replace-only (x-tfpfgen-update-style)",
+  "evidence": "audit/observations/account_group.observations.json#8c0374f4e3784920",
+  "operations": [
+    {
+      "op": "add",
+      "path": "/paths/~1account-groups~1{id}/put/x-tfpfgen-update-style",
+      "value": "replace-only"
+    }
+  ]
+}
