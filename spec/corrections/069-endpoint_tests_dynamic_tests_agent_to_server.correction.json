@@ -1,0 +1,33 @@
+{
+  "justification": "the audit confirmed a values observation on endpoint_tests_dynamic_tests_agent_to_server.tcpProbeMode: the live API rejects the documented value(s) auto, sack, syn",
+  "evidence": "audit/observations/endpoint_tests_dynamic_tests_agent_to_server.observations.json#75a3bc403158510e",
+  "operations": [
+    {
+      "op": "test",
+      "path": "/components/schemas/Endpoint_Tests_API_TestProbeMode/enum/0",
+      "value": "auto"
+    },
+    {
+      "op": "remove",
+      "path": "/components/schemas/Endpoint_Tests_API_TestProbeMode/enum/0"
+    },
+    {
+      "op": "test",
+      "path": "/components/schemas/Endpoint_Tests_API_TestProbeMode/enum/0",
+      "value": "sack"
+    },
+    {
+      "op": "remove",
+      "path": "/components/schemas/Endpoint_Tests_API_TestProbeMode/enum/0"
+    },
+    {
+      "op": "test",
+      "path": "/components/schemas/Endpoint_Tests_API_TestProbeMode/enum/0",
+      "value": "syn"
+    },
+    {
+      "op": "remove",
+      "path": "/components/schemas/Endpoint_Tests_API_TestProbeMode/enum/0"
+    }
+  ]
+}
