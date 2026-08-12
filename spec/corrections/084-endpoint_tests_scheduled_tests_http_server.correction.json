@@ -1,0 +1,11 @@
+{
+  "justification": "the audit confirmed an updateStyle observation on endpoint_tests_scheduled_tests_http_server: the update operation treats omitted fields as put-full (x-tfpfgen-update-style)",
+  "evidence": "audit/observations/endpoint_tests_scheduled_tests_http_server.observations.json#35a9aa6355a771bd",
+  "operations": [
+    {
+      "op": "add",
+      "path": "/paths/~1endpoint~1tests~1scheduled-tests~1http-server~1{testId}/patch/x-tfpfgen-update-style",
+      "value": "put-full"
+    }
+  ]
+}
