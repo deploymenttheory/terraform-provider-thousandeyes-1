@@ -1,0 +1,33 @@
+{
+  "justification": "the audit confirmed a values observation on endpoint_tests_scheduled_tests_http_server.authType: the live API rejects the documented value(s) basic, none, ntlm",
+  "evidence": "audit/observations/endpoint_tests_scheduled_tests_http_server.observations.json#49135da513df996b",
+  "operations": [
+    {
+      "op": "test",
+      "path": "/components/schemas/Endpoint_Tests_API_EndpointTestAuthType/enum/1",
+      "value": "basic"
+    },
+    {
+      "op": "remove",
+      "path": "/components/schemas/Endpoint_Tests_API_EndpointTestAuthType/enum/1"
+    },
+    {
+      "op": "test",
+      "path": "/components/schemas/Endpoint_Tests_API_EndpointTestAuthType/enum/0",
+      "value": "none"
+    },
+    {
+      "op": "remove",
+      "path": "/components/schemas/Endpoint_Tests_API_EndpointTestAuthType/enum/0"
+    },
+    {
+      "op": "test",
+      "path": "/components/schemas/Endpoint_Tests_API_EndpointTestAuthType/enum/0",
+      "value": "ntlm"
+    },
+    {
+      "op": "remove",
+      "path": "/components/schemas/Endpoint_Tests_API_EndpointTestAuthType/enum/0"
+    }
+  ]
+}
