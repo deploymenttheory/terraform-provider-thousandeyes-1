@@ -1,0 +1,11 @@
+{
+  "justification": "the audit confirmed a serverDefault observation on account_group.isCurrentAccountGroup: omitting the property stores false, so the generated attribute is Optional and Computed (x-tfpfgen-server-default)",
+  "evidence": "audit/observations/account_group.observations.json#bbc7955093d1af64",
+  "operations": [
+    {
+      "op": "add",
+      "path": "/components/schemas/Administrative_API_AccountGroupInfo/allOf/1/properties/isCurrentAccountGroup/x-tfpfgen-server-default",
+      "value": false
+    }
+  ]
+}
