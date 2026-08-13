@@ -1,0 +1,11 @@
+{
+  "justification": "the audit confirmed a serverDefault observation on endpoint_tests_scheduled_tests_agent_to_server.isPrioritized: omitting the property stores false, so the generated attribute is Optional and Computed (x-tfpfgen-server-default)",
+  "evidence": "audit/observations/endpoint_tests_scheduled_tests_agent_to_server.observations.json#a2798ce1edf98e4a",
+  "operations": [
+    {
+      "op": "add",
+      "path": "/components/schemas/Endpoint_Tests_API_EndpointAgentToServerTestRequest/allOf/1/properties/isPrioritized/x-tfpfgen-server-default",
+      "value": false
+    }
+  ]
+}
