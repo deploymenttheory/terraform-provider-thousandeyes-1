@@ -1,0 +1,11 @@
+{
+  "justification": "the audit confirmed an updateStyle observation on endpoint_tests_scheduled_tests_agent_to_server: the update operation treats omitted fields as replace-only (x-tfpfgen-update-style)",
+  "evidence": "audit/observations/endpoint_tests_scheduled_tests_agent_to_server.observations.json#5b6d090c86adc405",
+  "operations": [
+    {
+      "op": "add",
+      "path": "/paths/~1endpoint~1tests~1scheduled-tests~1agent-to-server~1{testId}/patch/x-tfpfgen-update-style",
+      "value": "replace-only"
+    }
+  ]
+}
