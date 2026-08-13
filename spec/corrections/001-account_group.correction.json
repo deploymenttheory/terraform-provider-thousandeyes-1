@@ -1,0 +1,11 @@
+{
+  "justification": "the audit confirmed a deleteNotFoundOK observation on account_group: deleting an already-deleted object answers 404, which delete logic should treat as success (x-tfpfgen-delete-not-found-ok)",
+  "evidence": "audit/observations/account_group.observations.json#37cfb81dc2cf0800",
+  "operations": [
+    {
+      "op": "add",
+      "path": "/paths/~1account-groups~1{id}/delete/x-tfpfgen-delete-not-found-ok",
+      "value": true
+    }
+  ]
+}
