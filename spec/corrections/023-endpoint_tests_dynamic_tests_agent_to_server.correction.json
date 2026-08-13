@@ -1,0 +1,42 @@
+{
+  "justification": "the audit confirmed a values observation on endpoint_tests_dynamic_tests_agent_to_server.agentSelectorType: the live API rejects the documented value(s) agent-labels, agent-tags, all-agents, specific-agents",
+  "evidence": "audit/observations/endpoint_tests_dynamic_tests_agent_to_server.observations.json#7f3d2e37f627c698",
+  "operations": [
+    {
+      "op": "test",
+      "path": "/components/schemas/Endpoint_Tests_API_EndpointTestAgentSelectorType/enum/2",
+      "value": "agent-labels"
+    },
+    {
+      "op": "remove",
+      "path": "/components/schemas/Endpoint_Tests_API_EndpointTestAgentSelectorType/enum/2"
+    },
+    {
+      "op": "test",
+      "path": "/components/schemas/Endpoint_Tests_API_EndpointTestAgentSelectorType/enum/2",
+      "value": "agent-tags"
+    },
+    {
+      "op": "remove",
+      "path": "/components/schemas/Endpoint_Tests_API_EndpointTestAgentSelectorType/enum/2"
+    },
+    {
+      "op": "test",
+      "path": "/components/schemas/Endpoint_Tests_API_EndpointTestAgentSelectorType/enum/0",
+      "value": "all-agents"
+    },
+    {
+      "op": "remove",
+      "path": "/components/schemas/Endpoint_Tests_API_EndpointTestAgentSelectorType/enum/0"
+    },
+    {
+      "op": "test",
+      "path": "/components/schemas/Endpoint_Tests_API_EndpointTestAgentSelectorType/enum/0",
+      "value": "specific-agents"
+    },
+    {
+      "op": "remove",
+      "path": "/components/schemas/Endpoint_Tests_API_EndpointTestAgentSelectorType/enum/0"
+    }
+  ]
+}
