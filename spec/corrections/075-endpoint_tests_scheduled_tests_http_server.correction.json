@@ -1,0 +1,11 @@
+{
+  "justification": "the audit confirmed a serverDefault observation on endpoint_tests_scheduled_tests_http_server.httpTimeLimit: omitting the property stores 5000, so the generated attribute is Optional and Computed (x-tfpfgen-server-default)",
+  "evidence": "audit/observations/endpoint_tests_scheduled_tests_http_server.observations.json#408c31b107785990",
+  "operations": [
+    {
+      "op": "add",
+      "path": "/components/schemas/Endpoint_Tests_API_EndpointHttpServerBaseTest/properties/httpTimeLimit/x-tfpfgen-server-default",
+      "value": 5000
+    }
+  ]
+}
